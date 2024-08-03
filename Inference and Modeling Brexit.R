@@ -5,7 +5,7 @@ library(dslabs)
 data("brexit_polls")
 
 head(brexit_polls)
-
+# test
 p <- 0.481
 d <- 2*p - 1
 N <- 1500
