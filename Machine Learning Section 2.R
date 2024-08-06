@@ -2,21 +2,13 @@ mnist <- read_mnist()
 head(mnist)
 ncol(mnist$train$images)
 
-<<<<<<< HEAD
 
-# 2.1 Q2
-if (!require("dplyr", "lubridate")) install.packages("dplyr", "lubridate")
-library(dslabs)
-library(dplyr)
-library(lubridate)
-=======
-packages <- c("dplyr", "lubridate", "dslabs", "caret")
+packages <- c("dplyr", "lubridate", "dslabs", "caret", "purrr")
 for (package in packages) {
   if (!require(package, character.only = TRUE)) install.packages(package)
   library(package, character.only = TRUE)
 }
 
->>>>>>> 97c0a97454b3c0b884565723974279a7cd9513eb
 data(reported_heights)
 
 dat <- mutate(reported_heights, date_time = ymd_hms(time_stamp)) %>%
@@ -25,9 +17,6 @@ dat <- mutate(reported_heights, date_time = ymd_hms(time_stamp)) %>%
   select(sex, type)
 
 y <- factor(dat$sex, c("Female", "Male"))
-<<<<<<< HEAD
-x <- dat$type
-=======
 x <- dat$type
 
 dat %>%
@@ -50,5 +39,49 @@ iris <- iris[-which(iris$Species=='setosa'),]
 y <- iris$Species
 
 set.seed(76)
-createDataPartition(y, times = 1, p = 0.5)
->>>>>>> 97c0a97454b3c0b884565723974279a7cd9513eb
+test_index <- createDataPartition(y, times = 1, p = 0.5, list = FALSE)
+test <- iris[test_index,]
+train <- iris[-test_index,]
+
+
+r <- range(train$Petal.Width)
+cutoff <- seq(r[1], r[2], 0.1)
+accuracy <- map_dbl(cutoff, function(x){
+  y_hat <- ifelse(train$Petal.Width > x, 'virginica', 'versicolor') %>%
+    factor(levels = levels(test$Species))
+  mean(y_hat == train$Species)
+})
+
+data.frame(cutoff, accuracy) %>%
+  ggplot(aes(cutoff, accuracy)) +
+  geom_point() +
+  geom_line()
+wid <- cutoff[which.max(accuracy)]
+
+
+y_hat <- ifelse(test$Petal.Width > 1.5, 'virginica', 'versicolor') %>%
+  factor(levels = levels(test$Species))
+mean(y_hat == test$Species)
+
+
+plot(iris, pch=21, bg=iris$Species)
+
+
+r <- range(train$Petal.Length)
+cutoff <- seq(r[1], r[2], 0.1)
+accuracy <- map_dbl(cutoff, function(x){
+  y_hat <- ifelse(train$Petal.Length > x, 'virginica', 'versicolor') %>%
+    factor(levels = levels(test$Species))
+  mean(y_hat == train$Species)
+})
+
+data.frame(cutoff, accuracy) %>%
+  ggplot(aes(cutoff, accuracy)) +
+  geom_point() +
+  geom_line()
+len <- cutoff[which.max(accuracy)]
+
+
+y_hat <- ifelse(test$Petal.Width > wid & test$Petal.Length > len, 'virginica', 'versicolor') %>%
+  factor(levels = levels(test$Species))
+mean(y_hat == test$Species)
