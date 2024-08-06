@@ -2,7 +2,7 @@ mnist <- read_mnist()
 head(mnist)
 ncol(mnist$train$images)
 
-packages <- c("dplyr", "lubridate", "dslabs")
+packages <- c("dplyr", "lubridate", "dslabs", "caret")
 for (package in packages) {
   if (!require(package, character.only = TRUE)) install.packages(package)
   library(package, character.only = TRUE)
@@ -22,5 +22,20 @@ dat %>%
   group_by(type) %>%
   summarise(female = mean(sex == 'Female'), male = mean(sex == 'Male'))
 
-y_hat <- ifelse(x == 'inclass', 'Female', 'Male')
+y_hat <- ifelse(x == 'inclass', 'Female', 'Male') %>% factor(levels = levels(y))
 mean(y == y_hat)
+
+table(y_hat, y)
+sensitivity(y_hat, y)
+specificity(y_hat, y)
+table(predict = y_hat, actual = y)
+(26+13) / (26+42+13+69)
+
+
+# 2.1 Q3
+data(iris)
+iris <- iris[-which(iris$Species=='setosa'),]
+y <- iris$Species
+
+set.seed(76)
+createDataPartition(y, times = 1, p = 0.5)
